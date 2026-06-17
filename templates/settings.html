@@ -100,11 +100,13 @@
 
   <!-- ── Manage Categories ── -->
   <div class="settings-section">
-    <h2>Categories</h2>
+    <h2>Categories <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">drag ☰ to reorder</span></h2>
+    <div id="category-sortable">
     {% for cat in categories %}
-    <div x-data="{ editing: false }" style="border-bottom:var(--surface-border,1px solid rgba(128,128,128,0.15));">
+    <div x-data="{ editing: false }" data-id="{{ cat.id }}" style="border-bottom:var(--surface-border,1px solid rgba(128,128,128,0.15));">
       <div class="item-row" style="border-bottom:none;">
         <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span class="drag-handle" title="Drag to reorder">&#9776;</span>
           {% if cat.image %}
             <img src="{{ cat.image.url }}" style="width:32px;height:32px;object-fit:cover;border-radius:6px;">
           {% else %}
@@ -151,6 +153,7 @@
     {% empty %}
     <p style="color:var(--text-muted);padding:1rem 0;">No categories yet.</p>
     {% endfor %}
+    </div>
   </div>
 
   <!-- ── Add Exercise ── -->
@@ -180,7 +183,7 @@
 
   <!-- ── Manage Exercises ── -->
   <div class="settings-section">
-    <h2>Exercises</h2>
+    <h2>Exercises <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">drag ☰ to reorder within group</span></h2>
     {% regroup exercises by category as cat_groups %}
     {% for group in cat_groups %}
     <div style="margin-bottom:1rem;">
@@ -188,11 +191,13 @@
                   text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">
         {{ group.grouper }}
       </div>
+      <div class="exercise-sortable">
       {% for ex in group.list %}
-      <div x-data="{ editing: false }" style="padding-left:0.75rem;">
+      <div x-data="{ editing: false }" data-id="{{ ex.id }}" style="padding-left:0.75rem;">
         <div class="item-row">
-          <span {% if not ex.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>
-            {{ ex.name }}
+          <span style="display:flex;align-items:center;gap:0.5rem;">
+            <span class="drag-handle" title="Drag to reorder">&#9776;</span>
+            <span {% if not ex.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>{{ ex.name }}</span>
           </span>
           <div class="flex-gap">
             <button type="button" class="btn btn-secondary btn-sm" @click="editing = !editing">Edit</button>
@@ -230,6 +235,7 @@
         </div>
       </div>
       {% endfor %}
+      </div>
     </div>
     {% empty %}
     <p style="color:var(--text-muted);padding:1rem 0;">No exercises yet.</p>
@@ -237,19 +243,49 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
 function selectTheme(key) {
-  // instant preview
   document.getElementById('html-root').setAttribute('data-theme', key);
   localStorage.setItem('theme', key);
-  // update all buttons
   document.querySelectorAll('.theme-option').forEach(function(btn) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  // submit to persist server-side
   document.getElementById('theme-input').value = key;
   document.getElementById('theme-form').submit();
 }
+
+(function() {
+  var CSRF = '{{ csrf_token }}';
+  function postOrder(url, ids) {
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+      body: JSON.stringify({ order: ids })
+    });
+  }
+  function idsOf(container) {
+    return Array.prototype.slice.call(container.children)
+      .filter(function(el) { return el.dataset && el.dataset.id; })
+      .map(function(el) { return el.dataset.id; });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Sortable === 'undefined') return;
+    var catEl = document.getElementById('category-sortable');
+    if (catEl) {
+      new Sortable(catEl, {
+        handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
+        onEnd: function() { postOrder('{% url "category_reorder" %}', idsOf(catEl)); }
+      });
+    }
+    document.querySelectorAll('.exercise-sortable').forEach(function(el) {
+      new Sortable(el, {
+        handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
+        onEnd: function() { postOrder('{% url "exercise_reorder" %}', idsOf(el)); }
+      });
+    });
+  });
+})();
 </script>
 {% endblock %}

@@ -495,10 +495,23 @@ body.offline #offline-banner { display: block; }
   padding: 0 1rem;
   text-align: center;
   font-style: italic;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text-secondary);
   font-family: var(--font-ui, system-ui, sans-serif);
 }
+
+/* ── Drag-to-reorder ── */
+.drag-handle {
+  cursor: grab;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  padding: 0 0.3rem;
+  user-select: none;
+  touch-action: none;
+}
+.drag-handle:active { cursor: grabbing; }
+.sortable-ghost { opacity: 0.4; }
 
 /* ── Mobile ── */
 @media (max-width: 600px) {
