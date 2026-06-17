@@ -3,6 +3,14 @@
 {% block nav_home %}active{% endblock %}
 
 {% block content %}
+{% if pref.banner %}
+<div class="home-hero">
+  <img src="{{ pref.banner.url }}" alt="Gym Tracker banner">
+  <div class="hero-overlay">
+    <div class="hero-title">💪 Gym Tracker</div>
+  </div>
+</div>
+{% endif %}
 <div class="grid">
   {% for cat in categories %}
   <a href="{% url 'category_detail' cat.id %}" class="category-card">
