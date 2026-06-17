@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Settings — Gym Tracker{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="page-title">Settings</h1>
+
+  <!-- ── Theme ── -->
+  <div class="settings-section">
+    <h2>Theme</h2>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+      Choose from 11 visual styles. Preview applies instantly.
+    </p>
+    <form method="POST" action="{% url 'set_theme' %}" id="theme-form">
+      {% csrf_token %}
+      <input type="hidden" name="theme" id="theme-input" value="{{ pref.theme }}">
+      <div class="theme-grid">
+        {% for val, label in theme_choices %}
+        <button type="button"
+                class="theme-option {% if pref.theme == val %}active{% endif %}"
+                onclick="selectTheme('{{ val }}')">
+          {{ label }}
+        </button>
+        {% endfor %}
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Add Category ── -->
+  <div class="settings-section">
+    <h2>Add Category</h2>
+    <form method="POST" action="{% url 'category_add' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group" style="flex:2;">
+          <label>Name</label>
+          <input type="text" name="name" placeholder="e.g. Full Body" required>
+        </div>
+        <div class="form-group">
+          <label>Color</label>
+          <input type="color" name="color" value="#1a1a2e" style="height:42px;padding:4px;">
+        </div>
+        <div class="form-group" style="flex:2;">
+          <label>Image (optional)</label>
+          <input type="file" name="image" accept="image/*">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">+ Add Category</button>
+    </form>
+  </div>
+
+  <!-- ── Manage Categories ── -->
+  <div class="settings-section">
+    <h2>Categories</h2>
+    {% for cat in categories %}
+    <div class="item-row">
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        {% if cat.image %}
+          <img src="{{ cat.image.url }}" style="width:32px;height:32px;object-fit:cover;border-radius:6px;">
+        {% else %}
+          <span style="width:32px;height:32px;background:{{ cat.color }};border-radius:6px;display:inline-block;"></span>
+        {% endif %}
+        <span {% if not cat.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>
+          {{ cat.name }}
+        </span>
+        {% if not cat.is_active %}
+          <span style="font-size:0.75rem;color:var(--text-muted);">(hidden)</span>
+        {% endif %}
+      </div>
+      <div class="flex-gap">
+        {% if cat.is_active %}
+        <form method="POST" action="{% url 'category_delete' cat.id %}" style="display:inline;"
+              onsubmit="return confirm('Hide {{ cat.name }}?')">
+          {% csrf_token %}
+          <button class="btn btn-danger btn-sm">Hide</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <p style="color:var(--text-muted);padding:1rem 0;">No categories yet.</p>
+    {% endfor %}
+  </div>
+
+  <!-- ── Add Exercise ── -->
+  <div class="settings-section">
+    <h2>Add Exercise</h2>
+    <form method="POST" action="{% url 'exercise_add' %}">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category">
+            {% for cat in categories %}
+            {% if cat.is_active %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="flex:2;">
+          <label>Exercise Name</label>
+          <input type="text" name="name" placeholder="e.g. Cable Row" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">+ Add Exercise</button>
+    </form>
+  </div>
+
+  <!-- ── Manage Exercises ── -->
+  <div class="settings-section">
+    <h2>Exercises</h2>
+    {% regroup exercises by category as cat_groups %}
+    {% for group in cat_groups %}
+    <div style="margin-bottom:1rem;">
+      <div style="font-weight:700;color:var(--text-secondary);font-size:0.85rem;
+                  text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">
+        {{ group.grouper }}
+      </div>
+      {% for ex in group.list %}
+      <div class="item-row" style="padding-left:0.75rem;">
+        <span {% if not ex.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>
+          {{ ex.name }}
+        </span>
+        {% if ex.is_active %}
+        <form method="POST" action="{% url 'exercise_delete' ex.id %}" style="display:inline;"
+              onsubmit="return confirm('Remove {{ ex.name }}?')">
+          {% csrf_token %}
+          <button class="btn btn-danger btn-sm">Remove</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% empty %}
+    <p style="color:var(--text-muted);padding:1rem 0;">No exercises yet.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+function selectTheme(key) {
+  // instant preview
+  document.getElementById('html-root').setAttribute('data-theme', key);
+  localStorage.setItem('theme', key);
+  // update all buttons
+  document.querySelectorAll('.theme-option').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  // submit to persist server-side
+  document.getElementById('theme-input').value = key;
+  document.getElementById('theme-form').submit();
+}
+</script>
+{% endblock %}
