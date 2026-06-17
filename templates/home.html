@@ -6,10 +6,10 @@
 {% if pref.banner %}
 <div class="home-hero">
   <img src="{{ pref.banner.url }}" alt="Gym Tracker banner">
-  <div class="hero-overlay">
-    <div class="hero-title">💪 Gym Tracker</div>
-  </div>
 </div>
+{% endif %}
+{% if pref.quote %}
+<div class="home-quote">&ldquo;{{ pref.quote }}&rdquo;</div>
 {% endif %}
 <div class="grid">
   {% for cat in categories %}
