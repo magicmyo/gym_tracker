@@ -90,6 +90,50 @@
     </div>
   </div>
 
+  <!-- ── Data / Backup ── -->
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Data / Backup</span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+        Export your setup and history as CSV, or import a previous backup.
+        Importing logs auto-creates any missing categories or exercises.
+      </p>
+
+      <div style="font-weight:700;color:var(--text-secondary);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Settings</div>
+      <div class="flex-gap" style="margin-bottom:0.75rem;">
+        <a href="{% url 'export_settings' %}" class="btn btn-secondary btn-sm">⬇ Export Settings</a>
+      </div>
+      <form method="POST" action="{% url 'import_settings' %}" enctype="multipart/form-data" style="margin-bottom:1.5rem;">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Import settings CSV</label>
+            <input type="file" name="file" accept=".csv" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">⬆ Import Settings</button>
+      </form>
+
+      <div style="font-weight:700;color:var(--text-secondary);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Workout Logs</div>
+      <div class="flex-gap" style="margin-bottom:0.75rem;">
+        <a href="{% url 'export_logs' %}" class="btn btn-secondary btn-sm">⬇ Export Logs</a>
+      </div>
+      <form method="POST" action="{% url 'import_logs' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Import logs CSV</label>
+            <input type="file" name="file" accept=".csv" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">⬆ Import Logs</button>
+      </form>
+    </div>
+  </div>
+
   <!-- ── Add Category ── -->
   <div class="settings-section" x-data="{ open: false }">
     <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">

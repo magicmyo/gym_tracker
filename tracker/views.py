@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 import os
 from datetime import date as today_date
@@ -295,3 +297,147 @@ def service_worker(request):
     response = HttpResponse(content, content_type='application/javascript')
     response['Service-Worker-Allowed'] = '/'
     return response
+
+
+# ── CSV export / import ───────────────────────────────────────────────────────
+
+def export_settings(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="gymtracker_settings.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["record_type", "name", "kind", "color", "order", "category", "theme", "quote"])
+    pref = UserPreference.get()
+    writer.writerow(["preference", "", "", "", "", "", pref.theme, pref.quote])
+    for cat in Category.objects.all():
+        writer.writerow(["category", cat.name, cat.kind, cat.color, cat.order, "", "", ""])
+    for ex in Exercise.objects.select_related("category").all():
+        writer.writerow(["exercise", ex.name, "", "", ex.order, ex.category.name, "", ""])
+    return response
+
+
+@require_POST
+def import_settings(request):
+    f = request.FILES.get("file")
+    if not f:
+        return redirect("settings")
+    text = f.read().decode("utf-8-sig")
+    reader = csv.DictReader(io.StringIO(text))
+    cats, exs, pref_row = [], [], None
+    for row in reader:
+        rt = (row.get("record_type") or "").strip()
+        if rt == "category":
+            cats.append(row)
+        elif rt == "exercise":
+            exs.append(row)
+        elif rt == "preference":
+            pref_row = row
+
+    for row in cats:
+        name = (row.get("name") or "").strip()
+        if not name:
+            continue
+        cat, _ = Category.objects.get_or_create(name=name)
+        cat.kind = (row.get("kind") or "strength").strip() or "strength"
+        if (row.get("color") or "").strip():
+            cat.color = row["color"].strip()
+        try:
+            cat.order = int(row.get("order") or 0)
+        except (TypeError, ValueError):
+            pass
+        cat.is_active = True
+        cat.save()
+
+    for row in exs:
+        name = (row.get("name") or "").strip()
+        cat_name = (row.get("category") or "").strip()
+        if not name or not cat_name:
+            continue
+        cat, _ = Category.objects.get_or_create(name=cat_name)
+        ex, _ = Exercise.objects.get_or_create(category=cat, name=name)
+        try:
+            ex.order = int(row.get("order") or 0)
+        except (TypeError, ValueError):
+            pass
+        ex.is_active = True
+        ex.save()
+
+    if pref_row:
+        pref = UserPreference.get()
+        theme = (pref_row.get("theme") or "").strip()
+        valid = [k for k, _ in UserPreference._meta.get_field("theme").choices]
+        if theme in valid:
+            pref.theme = theme
+        pref.quote = (pref_row.get("quote") or "").strip()[:255]
+        pref.save()
+
+    return redirect("settings")
+
+
+def export_logs(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="gymtracker_logs.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["date", "category", "exercise", "weight", "weight_unit",
+                     "reps", "sets", "distance", "distance_unit", "duration", "notes"])
+    logs = WorkoutLog.objects.select_related("exercise__category").order_by("date", "id")
+    for log in logs:
+        writer.writerow([
+            log.date.isoformat(),
+            log.exercise.category.name,
+            log.exercise.name,
+            log.weight if log.weight is not None else "",
+            log.weight_unit,
+            log.reps if log.reps is not None else "",
+            log.sets if log.sets is not None else "",
+            log.distance if log.distance is not None else "",
+            log.distance_unit,
+            log.duration if log.duration is not None else "",
+            log.notes or "",
+        ])
+    return response
+
+
+@require_POST
+def import_logs(request):
+    f = request.FILES.get("file")
+    if not f:
+        return redirect("settings")
+    text = f.read().decode("utf-8-sig")
+    reader = csv.DictReader(io.StringIO(text))
+
+    def num(v):
+        v = (v or "").strip()
+        return v or None
+
+    def unit(v, default):
+        return default if v is None else v.strip()
+
+    for row in reader:
+        ex_name = (row.get("exercise") or "").strip()
+        date_str = (row.get("date") or "").strip()
+        if not ex_name or not date_str:
+            continue
+        cat_name = (row.get("category") or "").strip() or "Imported"
+        try:
+            log_date = today_date.fromisoformat(date_str)
+        except ValueError:
+            continue
+        cat, _ = Category.objects.get_or_create(name=cat_name)
+        ex, _ = Exercise.objects.get_or_create(category=cat, name=ex_name)
+        try:
+            WorkoutLog.objects.create(
+                exercise=ex,
+                date=log_date,
+                weight=num(row.get("weight")),
+                weight_unit=unit(row.get("weight_unit"), "kg"),
+                reps=num(row.get("reps")),
+                sets=num(row.get("sets")),
+                distance=num(row.get("distance")),
+                distance_unit=unit(row.get("distance_unit"), "km"),
+                duration=num(row.get("duration")),
+                notes=(row.get("notes") or "").strip(),
+            )
+        except Exception:
+            continue
+
+    return redirect("settings")
