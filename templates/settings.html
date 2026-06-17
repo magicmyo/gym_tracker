@@ -363,12 +363,12 @@
     </h2>
     <div x-show="open" x-transition style="margin-top:1rem;">
       <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
-        Restore the default categories &amp; exercises — your custom items and all logs are kept.
-        Or permanently delete all workout logs.
+        Restore the default categories &amp; exercises in their original order. This permanently
+        deletes ALL other categories, exercises, and workout logs. Theme, quote and banner are kept.
       </p>
       <div class="flex-gap">
         <form method="POST" action="{% url 'reset_defaults' %}" style="display:inline;"
-              onsubmit="return confirm('Are you sure? This restores default categories &amp; exercises. Your custom items and all logs are kept.')">
+              onsubmit="return confirm('Are you sure? This permanently deletes ALL categories, exercises and workout logs, then restores only the defaults. This cannot be undone.')">
           {% csrf_token %}
           <button type="submit" class="btn btn-secondary btn-sm">↺ Reset to Default Settings</button>
         </form>

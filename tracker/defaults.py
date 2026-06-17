@@ -49,3 +49,19 @@ def seed_defaults(Category, Exercise):
             if not ex_created and not ex.is_active:
                 ex.is_active = True
                 ex.save()
+
+
+def reset_to_defaults(Category, Exercise, WorkoutLog):
+    """Full factory reset: delete ALL workout logs, categories and exercises,
+    then recreate exactly the default categories & exercises in DEFAULT_CATEGORIES
+    order. Theme/quote/banner (UserPreference) are intentionally left untouched."""
+    WorkoutLog.objects.all().delete()
+    Category.objects.all().delete()  # cascades to Exercise (and any remaining logs)
+    for cat_order, (cname, kind, exercises) in enumerate(DEFAULT_CATEGORIES):
+        cat = Category.objects.create(
+            name=cname, kind=kind, order=cat_order, is_active=True
+        )
+        for ex_order, ename in enumerate(exercises):
+            Exercise.objects.create(
+                category=cat, name=ename, order=ex_order, is_active=True
+            )

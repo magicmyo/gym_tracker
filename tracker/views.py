@@ -14,7 +14,7 @@ from django.conf import settings as django_settings
 
 from .models import Category, Exercise, WorkoutLog, UserPreference
 from .forms import WorkoutLogForm, CategoryForm, ExerciseForm, BannerForm
-from .defaults import seed_defaults
+from .defaults import seed_defaults, reset_to_defaults
 
 
 # ── Home ──────────────────────────────────────────────────────────────────────
@@ -451,7 +451,7 @@ def import_logs(request):
 
 @require_POST
 def reset_defaults(request):
-    seed_defaults(Category, Exercise)
+    reset_to_defaults(Category, Exercise, WorkoutLog)
     return redirect("/settings/?saved=reset")
 
 
