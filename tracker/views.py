@@ -154,7 +154,9 @@ def category_delete(request, cat_id):
 def exercise_add(request):
     form = ExerciseForm(request.POST)
     if form.is_valid():
-        form.save()
+        ex = form.save(commit=False)
+        ex.order = Exercise.objects.filter(category=ex.category).count()
+        ex.save()
     return redirect("settings")
 
 
@@ -220,6 +222,28 @@ def exercise_edit(request, ex_id):
     if form.is_valid():
         form.save()
     return redirect("settings")
+
+
+@require_POST
+def category_reorder(request):
+    try:
+        ids = json.loads(request.body).get("order", [])
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "bad request"}, status=400)
+    for index, cid in enumerate(ids):
+        Category.objects.filter(pk=cid).update(order=index)
+    return JsonResponse({"ok": True})
+
+
+@require_POST
+def exercise_reorder(request):
+    try:
+        ids = json.loads(request.body).get("order", [])
+    except (ValueError, TypeError):
+        return JsonResponse({"error": "bad request"}, status=400)
+    for index, eid in enumerate(ids):
+        Exercise.objects.filter(pk=eid).update(order=index)
+    return JsonResponse({"ok": True})
 
 
 # ── Offline sync API ──────────────────────────────────────────────────────────

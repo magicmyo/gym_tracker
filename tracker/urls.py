@@ -18,5 +18,7 @@ urlpatterns = [
     path("settings/quote/", views.set_quote, name="set_quote"),
     path("settings/category/<int:cat_id>/edit/", views.category_edit, name="category_edit"),
     path("settings/exercise/<int:ex_id>/edit/", views.exercise_edit, name="exercise_edit"),
+    path("settings/category/reorder/", views.category_reorder, name="category_reorder"),
+    path("settings/exercise/reorder/", views.exercise_reorder, name="exercise_reorder"),
     path("api/sync/", views.api_sync, name="api_sync"),
 ]
