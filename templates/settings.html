@@ -56,6 +56,25 @@
     {% endif %}
   </div>
 
+  <!-- ── Motivation Quote ── -->
+  <div class="settings-section">
+    <h2>Motivation Quote</h2>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+      Shown under the cover image on the Home page. Leave blank to hide.
+    </p>
+    <form method="POST" action="{% url 'set_quote' %}">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group" style="flex:3;">
+          <label>Quote</label>
+          <input type="text" name="quote" maxlength="255" value="{{ pref.quote }}"
+                 placeholder="e.g. The body achieves what the mind believes.">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Save Quote</button>
+    </form>
+  </div>
+
   <!-- ── Add Category ── -->
   <div class="settings-section">
     <h2>Add Category</h2>
