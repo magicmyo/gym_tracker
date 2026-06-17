@@ -1,5 +1,5 @@
 from django import forms
-from .models import WorkoutLog, Category, Exercise
+from .models import WorkoutLog, Category, Exercise, UserPreference
 
 
 class WorkoutLogForm(forms.ModelForm):
@@ -25,3 +25,9 @@ class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
         fields = ["category", "name"]
+
+
+class BannerForm(forms.ModelForm):
+    class Meta:
+        model = UserPreference
+        fields = ["banner"]

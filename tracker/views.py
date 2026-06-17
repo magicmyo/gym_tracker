@@ -9,7 +9,7 @@ from django.db.models.functions import TruncWeek
 from datetime import timedelta
 
 from .models import Category, Exercise, WorkoutLog, UserPreference
-from .forms import WorkoutLogForm, CategoryForm, ExerciseForm
+from .forms import WorkoutLogForm, CategoryForm, ExerciseForm, BannerForm
 
 
 # ── Home ──────────────────────────────────────────────────────────────────────
@@ -19,6 +19,7 @@ def home(request):
     pref = UserPreference.get()
     return render(request, "home.html", {
         "categories": categories,
+        "pref": pref,
         "theme": pref.theme,
     })
 
@@ -173,6 +174,43 @@ def set_theme(request):
         pref = UserPreference.get()
         pref.theme = theme
         pref.save()
+    return redirect("settings")
+
+
+@require_POST
+def set_banner(request):
+    pref = UserPreference.get()
+    form = BannerForm(request.POST, request.FILES, instance=pref)
+    if form.is_valid():
+        form.save()
+    return redirect("settings")
+
+
+@require_POST
+def banner_remove(request):
+    pref = UserPreference.get()
+    if pref.banner:
+        pref.banner.delete(save=False)
+    pref.banner = None
+    pref.save()
+    return redirect("settings")
+
+
+@require_POST
+def category_edit(request, cat_id):
+    cat = get_object_or_404(Category, pk=cat_id)
+    form = CategoryForm(request.POST, request.FILES, instance=cat)
+    if form.is_valid():
+        form.save()
+    return redirect("settings")
+
+
+@require_POST
+def exercise_edit(request, ex_id):
+    ex = get_object_or_404(Exercise, pk=ex_id)
+    form = ExerciseForm(request.POST, instance=ex)
+    if form.is_valid():
+        form.save()
     return redirect("settings")
 
 
