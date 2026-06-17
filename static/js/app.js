@@ -74,7 +74,7 @@ function getCookie(name) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/static/js/sw.js')
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then(function() { console.log('[GymTracker] SW registered'); })
       .catch(function(e) { console.warn('[GymTracker] SW failed', e); });
   });

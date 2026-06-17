@@ -1,12 +1,14 @@
 import json
+import os
 from datetime import date as today_date
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncWeek
 from datetime import timedelta
+from django.conf import settings as django_settings
 
 from .models import Category, Exercise, WorkoutLog, UserPreference
 from .forms import WorkoutLogForm, CategoryForm, ExerciseForm, BannerForm
@@ -271,3 +273,14 @@ def api_sync(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
     return JsonResponse({"error": "POST only"}, status=405)
+
+
+# ── Service worker (served from root so scope covers entire app) ──────────────
+
+def service_worker(request):
+    sw_path = os.path.join(django_settings.BASE_DIR, 'static', 'js', 'sw.js')
+    with open(sw_path, 'rb') as f:
+        content = f.read()
+    response = HttpResponse(content, content_type='application/javascript')
+    response['Service-Worker-Allowed'] = '/'
+    return response

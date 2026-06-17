@@ -20,5 +20,6 @@ urlpatterns = [
     path("settings/exercise/<int:ex_id>/edit/", views.exercise_edit, name="exercise_edit"),
     path("settings/category/reorder/", views.category_reorder, name="category_reorder"),
     path("settings/exercise/reorder/", views.exercise_reorder, name="exercise_reorder"),
+    path("sw.js", views.service_worker, name="service_worker"),
     path("api/sync/", views.api_sync, name="api_sync"),
 ]
