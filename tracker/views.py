@@ -14,6 +14,7 @@ from django.conf import settings as django_settings
 
 from .models import Category, Exercise, WorkoutLog, UserPreference
 from .forms import WorkoutLogForm, CategoryForm, ExerciseForm, BannerForm
+from .defaults import seed_defaults
 
 
 # ── Home ──────────────────────────────────────────────────────────────────────
@@ -441,4 +442,34 @@ def import_logs(request):
         except Exception:
             continue
 
+    return redirect("settings")
+
+
+# ── Reset defaults / Danger Zone ──────────────────────────────────────────────
+
+@require_POST
+def reset_defaults(request):
+    seed_defaults(Category, Exercise)
+    return redirect("/settings/?saved=reset")
+
+
+@require_POST
+def clear_logs(request):
+    WorkoutLog.objects.all().delete()
+    return redirect("/settings/?saved=cleared")
+
+
+@require_POST
+def category_restore(request, cat_id):
+    cat = get_object_or_404(Category, pk=cat_id)
+    cat.is_active = True
+    cat.save()
+    return redirect("settings")
+
+
+@require_POST
+def exercise_restore(request, ex_id):
+    ex = get_object_or_404(Exercise, pk=ex_id)
+    ex.is_active = True
+    ex.save()
     return redirect("settings")

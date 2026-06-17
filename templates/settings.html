@@ -6,6 +6,12 @@
 <div class="container">
   <h1 class="page-title">Settings</h1>
 
+  {% if saved == 'reset' %}
+  <div style="color:var(--accent);font-size:0.9rem;margin-bottom:1rem;">✓ Settings reset to defaults.</div>
+  {% elif saved == 'cleared' %}
+  <div style="color:var(--accent);font-size:0.9rem;margin-bottom:1rem;">✓ All workout logs cleared.</div>
+  {% endif %}
+
   <!-- ── Theme ── -->
   <div class="settings-section" x-data="{ open: false }">
     <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
@@ -202,6 +208,11 @@
               {% csrf_token %}
               <button class="btn btn-danger btn-sm">Hide</button>
             </form>
+            {% else %}
+            <form method="POST" action="{% url 'category_restore' cat.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button class="btn btn-secondary btn-sm">Unhide</button>
+            </form>
             {% endif %}
           </div>
         </div>
@@ -303,6 +314,11 @@
                 {% csrf_token %}
                 <button class="btn btn-danger btn-sm">Remove</button>
               </form>
+              {% else %}
+              <form method="POST" action="{% url 'exercise_restore' ex.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button class="btn btn-secondary btn-sm">Restore</button>
+              </form>
               {% endif %}
             </div>
           </div>
@@ -336,6 +352,32 @@
       {% empty %}
       <p style="color:var(--text-muted);padding:1rem 0;">No exercises yet.</p>
       {% endfor %}
+    </div>
+  </div>
+
+  <!-- ── Reset / Danger Zone ── -->
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Reset / Danger Zone</span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+        Restore the default categories &amp; exercises — your custom items and all logs are kept.
+        Or permanently delete all workout logs.
+      </p>
+      <div class="flex-gap">
+        <form method="POST" action="{% url 'reset_defaults' %}" style="display:inline;"
+              onsubmit="return confirm('Are you sure? This restores default categories &amp; exercises. Your custom items and all logs are kept.')">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary btn-sm">↺ Reset to Default Settings</button>
+        </form>
+        <form method="POST" action="{% url 'clear_logs' %}" style="display:inline;"
+              onsubmit="return confirm('Are you sure? This permanently deletes ALL workout logs and cannot be undone.')">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">🗑 Clear All Logs</button>
+        </form>
+      </div>
     </div>
   </div>
 
