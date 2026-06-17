@@ -141,6 +141,7 @@ def settings_view(request):
         "exercises": exercises,
         "theme": pref.theme,
         "theme_choices": UserPreference._meta.get_field("theme").choices,
+        "saved": request.GET.get("saved", ""),
     })
 
 
@@ -215,7 +216,7 @@ def set_quote(request):
     pref = UserPreference.get()
     pref.quote = request.POST.get("quote", "").strip()[:255]
     pref.save()
-    return redirect("settings")
+    return redirect("/settings/?saved=quote")
 
 
 @require_POST

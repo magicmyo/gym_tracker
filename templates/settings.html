@@ -67,12 +67,15 @@
   </div>
 
   <!-- ── Motivation Quote ── -->
-  <div class="settings-section" x-data="{ open: false }">
+  <div class="settings-section" x-data="{ open: {% if saved == 'quote' %}true{% else %}false{% endif %} }">
     <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
       <span>Motivation Quote</span>
       <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
     </h2>
     <div x-show="open" x-transition style="margin-top:1rem;">
+      {% if saved == 'quote' %}
+      <div style="color:var(--accent);font-size:0.85rem;margin-bottom:0.75rem;">✓ Quote saved!</div>
+      {% endif %}
       <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
         Shown under the cover image on the Home page. Leave blank to hide.
       </p>
