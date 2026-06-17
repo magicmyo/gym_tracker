@@ -15,6 +15,7 @@ urlpatterns = [
     path("settings/theme/", views.set_theme, name="set_theme"),
     path("settings/banner/", views.set_banner, name="set_banner"),
     path("settings/banner/remove/", views.banner_remove, name="banner_remove"),
+    path("settings/quote/", views.set_quote, name="set_quote"),
     path("settings/category/<int:cat_id>/edit/", views.category_edit, name="category_edit"),
     path("settings/exercise/<int:ex_id>/edit/", views.exercise_edit, name="exercise_edit"),
     path("api/sync/", views.api_sync, name="api_sync"),

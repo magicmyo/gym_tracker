@@ -197,6 +197,14 @@ def banner_remove(request):
 
 
 @require_POST
+def set_quote(request):
+    pref = UserPreference.get()
+    pref.quote = request.POST.get("quote", "").strip()[:255]
+    pref.save()
+    return redirect("settings")
+
+
+@require_POST
 def category_edit(request, cat_id):
     cat = get_object_or_404(Category, pk=cat_id)
     form = CategoryForm(request.POST, request.FILES, instance=cat)
