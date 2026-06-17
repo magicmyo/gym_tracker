@@ -5,7 +5,7 @@ from .models import WorkoutLog, Category, Exercise, UserPreference
 class WorkoutLogForm(forms.ModelForm):
     class Meta:
         model = WorkoutLog
-        fields = ["exercise", "date", "weight", "weight_unit", "reps", "sets", "notes"]
+        fields = ["exercise", "date", "weight", "weight_unit", "reps", "sets", "distance", "distance_unit", "duration", "notes"]
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}),
             "notes": forms.Textarea(attrs={"rows": 2}),
@@ -15,7 +15,7 @@ class WorkoutLogForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ["name", "image", "color"]
+        fields = ["name", "kind", "image", "color"]
         widgets = {
             "color": forms.TextInput(attrs={"type": "color"}),
         }

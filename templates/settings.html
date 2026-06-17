@@ -7,224 +7,179 @@
   <h1 class="page-title">Settings</h1>
 
   <!-- ── Theme ── -->
-  <div class="settings-section">
-    <h2>Theme</h2>
-    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
-      Choose from 11 visual styles. Preview applies instantly.
-    </p>
-    <form method="POST" action="{% url 'set_theme' %}" id="theme-form">
-      {% csrf_token %}
-      <input type="hidden" name="theme" id="theme-input" value="{{ pref.theme }}">
-      <div class="theme-grid">
-        {% for val, label in theme_choices %}
-        <button type="button"
-                class="theme-option {% if pref.theme == val %}active{% endif %}"
-                onclick="selectTheme('{{ val }}')">
-          {{ label }}
-        </button>
-        {% endfor %}
-      </div>
-    </form>
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Theme</span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+        Choose from 11 visual styles. Preview applies instantly.
+      </p>
+      <form method="POST" action="{% url 'set_theme' %}" id="theme-form">
+        {% csrf_token %}
+        <input type="hidden" name="theme" id="theme-input" value="{{ pref.theme }}">
+        <div class="theme-grid">
+          {% for val, label in theme_choices %}
+          <button type="button"
+                  class="theme-option {% if pref.theme == val %}active{% endif %}"
+                  onclick="selectTheme('{{ val }}')">
+            {{ label }}
+          </button>
+          {% endfor %}
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- ── Banner Cover ── -->
-  <div class="settings-section">
-    <h2>Banner Cover</h2>
-    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
-      Upload a cover image shown at the top of the Home page.
-    </p>
-    {% if pref.banner %}
-    <div style="position:relative;border-radius:var(--card-radius,12px);overflow:hidden;margin-bottom:1rem;aspect-ratio:3/1;max-height:200px;">
-      <img src="{{ pref.banner.url }}" alt="Current banner" style="width:100%;height:100%;object-fit:cover;display:block;">
-    </div>
-    {% endif %}
-    <form method="POST" action="{% url 'set_banner' %}" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="form-row">
-        <div class="form-group" style="flex:2;">
-          <label>{% if pref.banner %}Replace image{% else %}Banner image{% endif %}</label>
-          <input type="file" name="banner" accept="image/*" required>
-        </div>
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Banner Cover</span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+        Upload a cover image shown at the top of the Home page.
+      </p>
+      {% if pref.banner %}
+      <div style="position:relative;border-radius:var(--card-radius,12px);overflow:hidden;margin-bottom:1rem;aspect-ratio:3/1;max-height:200px;">
+        <img src="{{ pref.banner.url }}" alt="Current banner" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
-      <button type="submit" class="btn btn-primary btn-sm">{% if pref.banner %}Update Banner{% else %}Upload Banner{% endif %}</button>
-    </form>
-    {% if pref.banner %}
-    <form method="POST" action="{% url 'banner_remove' %}" style="display:inline;margin-top:0.5rem;" onsubmit="return confirm('Remove banner?')">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger btn-sm">Remove Banner</button>
-    </form>
-    {% endif %}
+      {% endif %}
+      <form method="POST" action="{% url 'set_banner' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>{% if pref.banner %}Replace image{% else %}Banner image{% endif %}</label>
+            <input type="file" name="banner" accept="image/*" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">{% if pref.banner %}Update Banner{% else %}Upload Banner{% endif %}</button>
+      </form>
+      {% if pref.banner %}
+      <form method="POST" action="{% url 'banner_remove' %}" style="display:inline;margin-top:0.5rem;" onsubmit="return confirm('Remove banner?')">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm">Remove Banner</button>
+      </form>
+      {% endif %}
+    </div>
   </div>
 
   <!-- ── Motivation Quote ── -->
-  <div class="settings-section">
-    <h2>Motivation Quote</h2>
-    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
-      Shown under the cover image on the Home page. Leave blank to hide.
-    </p>
-    <form method="POST" action="{% url 'set_quote' %}">
-      {% csrf_token %}
-      <div class="form-row">
-        <div class="form-group" style="flex:3;">
-          <label>Quote</label>
-          <input type="text" name="quote" maxlength="255" value="{{ pref.quote }}"
-                 placeholder="e.g. The body achieves what the mind believes.">
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Motivation Quote</span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+        Shown under the cover image on the Home page. Leave blank to hide.
+      </p>
+      <form method="POST" action="{% url 'set_quote' %}">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group" style="flex:3;">
+            <label>Quote</label>
+            <input type="text" name="quote" maxlength="255" value="{{ pref.quote }}"
+                   placeholder="e.g. The body achieves what the mind believes.">
+          </div>
         </div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-sm">Save Quote</button>
-    </form>
+        <button type="submit" class="btn btn-primary btn-sm">Save Quote</button>
+      </form>
+    </div>
   </div>
 
   <!-- ── Add Category ── -->
-  <div class="settings-section">
-    <h2>Add Category</h2>
-    <form method="POST" action="{% url 'category_add' %}" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="form-row">
-        <div class="form-group" style="flex:2;">
-          <label>Name</label>
-          <input type="text" name="name" placeholder="e.g. Full Body" required>
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Add Category</span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <form method="POST" action="{% url 'category_add' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="e.g. Full Body" required>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select name="kind">
+              <option value="strength">Strength</option>
+              <option value="cardio">Cardio</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <input type="color" name="color" value="#1a1a2e" style="height:42px;padding:4px;">
+          </div>
+          <div class="form-group" style="flex:2;">
+            <label>Image (optional)</label>
+            <input type="file" name="image" accept="image/*">
+          </div>
         </div>
-        <div class="form-group">
-          <label>Color</label>
-          <input type="color" name="color" value="#1a1a2e" style="height:42px;padding:4px;">
-        </div>
-        <div class="form-group" style="flex:2;">
-          <label>Image (optional)</label>
-          <input type="file" name="image" accept="image/*">
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-sm">+ Add Category</button>
-    </form>
+        <button type="submit" class="btn btn-primary btn-sm">+ Add Category</button>
+      </form>
+    </div>
   </div>
 
   <!-- ── Manage Categories ── -->
-  <div class="settings-section">
-    <h2>Categories <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">drag ☰ to reorder</span></h2>
-    <div id="category-sortable">
-    {% for cat in categories %}
-    <div x-data="{ editing: false }" data-id="{{ cat.id }}" style="border-bottom:var(--surface-border,1px solid rgba(128,128,128,0.15));">
-      <div class="item-row" style="border-bottom:none;">
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <span class="drag-handle" title="Drag to reorder">&#9776;</span>
-          {% if cat.image %}
-            <img src="{{ cat.image.url }}" style="width:32px;height:32px;object-fit:cover;border-radius:6px;">
-          {% else %}
-            <span style="width:32px;height:32px;background:{{ cat.color }};border-radius:6px;display:inline-block;"></span>
-          {% endif %}
-          <span {% if not cat.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>{{ cat.name }}</span>
-          {% if not cat.is_active %}<span style="font-size:0.75rem;color:var(--text-muted);">(hidden)</span>{% endif %}
-        </div>
-        <div class="flex-gap">
-          <button type="button" class="btn btn-secondary btn-sm" @click="editing = !editing">Edit</button>
-          {% if cat.is_active %}
-          <form method="POST" action="{% url 'category_delete' cat.id %}" style="display:inline;"
-                onsubmit="return confirm('Hide {{ cat.name }}?')">
-            {% csrf_token %}
-            <button class="btn btn-danger btn-sm">Hide</button>
-          </form>
-          {% endif %}
-        </div>
-      </div>
-      <div x-show="editing" x-transition style="padding:0 0 0.9rem;">
-        <form method="POST" action="{% url 'category_edit' cat.id %}" enctype="multipart/form-data" class="log-form">
-          {% csrf_token %}
-          <div class="form-row">
-            <div class="form-group" style="flex:2;">
-              <label>Name</label>
-              <input type="text" name="name" value="{{ cat.name }}" required>
-            </div>
-            <div class="form-group">
-              <label>Color</label>
-              <input type="color" name="color" value="{{ cat.color }}" style="height:42px;padding:4px;">
-            </div>
-            <div class="form-group" style="flex:2;">
-              <label>Replace Image</label>
-              <input type="file" name="image" accept="image/*">
-            </div>
-          </div>
-          <div class="flex-gap">
-            <button type="submit" class="btn btn-primary btn-sm">Save</button>
-            <button type="button" class="btn btn-secondary btn-sm" @click="editing = false">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    {% empty %}
-    <p style="color:var(--text-muted);padding:1rem 0;">No categories yet.</p>
-    {% endfor %}
-    </div>
-  </div>
-
-  <!-- ── Add Exercise ── -->
-  <div class="settings-section">
-    <h2>Add Exercise</h2>
-    <form method="POST" action="{% url 'exercise_add' %}">
-      {% csrf_token %}
-      <div class="form-row">
-        <div class="form-group">
-          <label>Category</label>
-          <select name="category">
-            {% for cat in categories %}
-            {% if cat.is_active %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-            {% endif %}
-            {% endfor %}
-          </select>
-        </div>
-        <div class="form-group" style="flex:2;">
-          <label>Exercise Name</label>
-          <input type="text" name="name" placeholder="e.g. Cable Row" required>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-sm">+ Add Exercise</button>
-    </form>
-  </div>
-
-  <!-- ── Manage Exercises ── -->
-  <div class="settings-section">
-    <h2>Exercises <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">drag ☰ to reorder within group</span></h2>
-    {% regroup exercises by category as cat_groups %}
-    {% for group in cat_groups %}
-    <div style="margin-bottom:1rem;">
-      <div style="font-weight:700;color:var(--text-secondary);font-size:0.85rem;
-                  text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">
-        {{ group.grouper }}
-      </div>
-      <div class="exercise-sortable">
-      {% for ex in group.list %}
-      <div x-data="{ editing: false }" data-id="{{ ex.id }}" style="padding-left:0.75rem;">
-        <div class="item-row">
-          <span style="display:flex;align-items:center;gap:0.5rem;">
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Categories <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">drag ☰ to reorder</span></span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <div id="category-sortable">
+      {% for cat in categories %}
+      <div x-data="{ editing: false }" data-id="{{ cat.id }}" style="border-bottom:var(--surface-border,1px solid rgba(128,128,128,0.15));">
+        <div class="item-row" style="border-bottom:none;">
+          <div style="display:flex;align-items:center;gap:0.5rem;">
             <span class="drag-handle" title="Drag to reorder">&#9776;</span>
-            <span {% if not ex.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>{{ ex.name }}</span>
-          </span>
+            {% if cat.image %}
+              <img src="{{ cat.image.url }}" style="width:32px;height:32px;object-fit:cover;border-radius:6px;">
+            {% else %}
+              <span style="width:32px;height:32px;background:{{ cat.color }};border-radius:6px;display:inline-block;"></span>
+            {% endif %}
+            <span {% if not cat.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>{{ cat.name }}</span>
+            {% if cat.kind == "cardio" %}<span style="font-size:0.7rem;color:var(--text-muted);margin-left:0.25rem;">cardio</span>{% endif %}
+            {% if not cat.is_active %}<span style="font-size:0.75rem;color:var(--text-muted);">(hidden)</span>{% endif %}
+          </div>
           <div class="flex-gap">
             <button type="button" class="btn btn-secondary btn-sm" @click="editing = !editing">Edit</button>
-            {% if ex.is_active %}
-            <form method="POST" action="{% url 'exercise_delete' ex.id %}" style="display:inline;"
-                  onsubmit="return confirm('Remove {{ ex.name }}?')">
+            {% if cat.is_active %}
+            <form method="POST" action="{% url 'category_delete' cat.id %}" style="display:inline;"
+                  onsubmit="return confirm('Hide {{ cat.name }}?')">
               {% csrf_token %}
-              <button class="btn btn-danger btn-sm">Remove</button>
+              <button class="btn btn-danger btn-sm">Hide</button>
             </form>
             {% endif %}
           </div>
         </div>
         <div x-show="editing" x-transition style="padding:0 0 0.9rem;">
-          <form method="POST" action="{% url 'exercise_edit' ex.id %}" class="log-form">
+          <form method="POST" action="{% url 'category_edit' cat.id %}" enctype="multipart/form-data" class="log-form">
             {% csrf_token %}
             <div class="form-row">
+              <div class="form-group" style="flex:2;">
+                <label>Name</label>
+                <input type="text" name="name" value="{{ cat.name }}" required>
+              </div>
               <div class="form-group">
-                <label>Category</label>
-                <select name="category">
-                  {% for c in categories %}
-                  <option value="{{ c.id }}" {% if c.id == ex.category_id %}selected{% endif %}>{{ c.name }}</option>
-                  {% endfor %}
+                <label>Type</label>
+                <select name="kind">
+                  <option value="strength" {% if cat.kind == "strength" %}selected{% endif %}>Strength</option>
+                  <option value="cardio" {% if cat.kind == "cardio" %}selected{% endif %}>Cardio</option>
                 </select>
               </div>
+              <div class="form-group">
+                <label>Color</label>
+                <input type="color" name="color" value="{{ cat.color }}" style="height:42px;padding:4px;">
+              </div>
               <div class="form-group" style="flex:2;">
-                <label>Exercise Name</label>
-                <input type="text" name="name" value="{{ ex.name }}" required>
+                <label>Replace Image</label>
+                <input type="file" name="image" accept="image/*">
               </div>
             </div>
             <div class="flex-gap">
@@ -234,13 +189,109 @@
           </form>
         </div>
       </div>
+      {% empty %}
+      <p style="color:var(--text-muted);padding:1rem 0;">No categories yet.</p>
       {% endfor %}
       </div>
     </div>
-    {% empty %}
-    <p style="color:var(--text-muted);padding:1rem 0;">No exercises yet.</p>
-    {% endfor %}
   </div>
+
+  <!-- ── Add Exercise ── -->
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Add Exercise</span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      <form method="POST" action="{% url 'exercise_add' %}">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category">
+              {% for cat in categories %}
+              {% if cat.is_active %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" style="flex:2;">
+            <label>Exercise Name</label>
+            <input type="text" name="name" placeholder="e.g. Cable Row" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">+ Add Exercise</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Manage Exercises ── -->
+  <div class="settings-section" x-data="{ open: false }">
+    <h2 @click="open = !open" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+      <span>Exercises <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">drag ☰ to reorder within group</span></span>
+      <span x-text="open ? '▾' : '▸'" style="color:var(--text-muted);font-size:0.9rem;"></span>
+    </h2>
+    <div x-show="open" x-transition style="margin-top:1rem;">
+      {% regroup exercises by category as cat_groups %}
+      {% for group in cat_groups %}
+      <div style="margin-bottom:1rem;">
+        <div style="font-weight:700;color:var(--text-secondary);font-size:0.85rem;
+                    text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">
+          {{ group.grouper }}
+        </div>
+        <div class="exercise-sortable">
+        {% for ex in group.list %}
+        <div x-data="{ editing: false }" data-id="{{ ex.id }}" style="padding-left:0.75rem;">
+          <div class="item-row">
+            <span style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="drag-handle" title="Drag to reorder">&#9776;</span>
+              <span {% if not ex.is_active %}style="color:var(--text-muted);text-decoration:line-through;"{% endif %}>{{ ex.name }}</span>
+            </span>
+            <div class="flex-gap">
+              <button type="button" class="btn btn-secondary btn-sm" @click="editing = !editing">Edit</button>
+              {% if ex.is_active %}
+              <form method="POST" action="{% url 'exercise_delete' ex.id %}" style="display:inline;"
+                    onsubmit="return confirm('Remove {{ ex.name }}?')">
+                {% csrf_token %}
+                <button class="btn btn-danger btn-sm">Remove</button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+          <div x-show="editing" x-transition style="padding:0 0 0.9rem;">
+            <form method="POST" action="{% url 'exercise_edit' ex.id %}" class="log-form">
+              {% csrf_token %}
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Category</label>
+                  <select name="category">
+                    {% for c in categories %}
+                    <option value="{{ c.id }}" {% if c.id == ex.category_id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group" style="flex:2;">
+                  <label>Exercise Name</label>
+                  <input type="text" name="name" value="{{ ex.name }}" required>
+                </div>
+              </div>
+              <div class="flex-gap">
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                <button type="button" class="btn btn-secondary btn-sm" @click="editing = false">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+        </div>
+      </div>
+      {% empty %}
+      <p style="color:var(--text-muted);padding:1rem 0;">No exercises yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>

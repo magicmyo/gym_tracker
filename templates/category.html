@@ -16,15 +16,29 @@
     <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;"
          @click="open = !open">
       <div>
-        <div class="ex-name">{{ item.exercise.name }}{% if item.latest.weight %} - {{ item.latest.weight|floatformat:'-2' }}{% if item.latest.weight_unit %} {{ item.latest.weight_unit }}{% endif %}{% endif %}</div>
-        {% if item.latest %}
-        <div class="ex-meta">
-          Last: {{ item.latest.date|date:'j M Y' }}
-          {% if item.latest.weight %}&nbsp;·&nbsp;{{ item.latest.weight|floatformat:'-2' }}{% if item.latest.weight_unit %} {{ item.latest.weight_unit }}{% endif %}{% endif %}
-          {% if item.latest.reps %}&nbsp;·&nbsp;{{ item.latest.reps }} reps{% endif %}{% if item.latest.sets %} x {{ item.latest.sets }} sets{% endif %}
-        </div>
+        {% if is_cardio %}
+          <div class="ex-name">{{ item.exercise.name }}{% if item.latest.distance %} - {{ item.latest.distance|floatformat:'-2' }} {% if item.latest.distance_unit == 'mi' %}mile{% else %}km{% endif %}{% endif %}</div>
+          {% if item.latest %}
+          <div class="ex-meta">
+            Last: {{ item.latest.date|date:'j M Y' }}
+            {% if item.latest.distance %}&nbsp;·&nbsp;{{ item.latest.distance|floatformat:'-2' }} {% if item.latest.distance_unit == 'mi' %}mile{% else %}km{% endif %}{% endif %}
+            {% if item.latest.duration %}&nbsp;·&nbsp;{{ item.latest.duration }} min{% endif %}
+            {% if item.speed %}&nbsp;·&nbsp;{{ item.speed }} {% if item.latest.distance_unit == 'mi' %}mile/hr{% else %}km/hr{% endif %}{% endif %}
+          </div>
+          {% else %}
+          <div class="ex-meta">No logs yet</div>
+          {% endif %}
         {% else %}
-        <div class="ex-meta">No logs yet</div>
+          <div class="ex-name">{{ item.exercise.name }}{% if item.latest.weight %} - {{ item.latest.weight|floatformat:'-2' }}{% if item.latest.weight_unit %} {{ item.latest.weight_unit }}{% endif %}{% endif %}</div>
+          {% if item.latest %}
+          <div class="ex-meta">
+            Last: {{ item.latest.date|date:'j M Y' }}
+            {% if item.latest.weight %}&nbsp;·&nbsp;{{ item.latest.weight|floatformat:'-2' }}{% if item.latest.weight_unit %} {{ item.latest.weight_unit }}{% endif %}{% endif %}
+            {% if item.latest.reps %}&nbsp;·&nbsp;{{ item.latest.reps }} reps{% endif %}{% if item.latest.sets %} x {{ item.latest.sets }} sets{% endif %}
+          </div>
+          {% else %}
+          <div class="ex-meta">No logs yet</div>
+          {% endif %}
         {% endif %}
       </div>
       <span x-text="open ? '▲' : '▼'" style="color:var(--text-muted);font-size:0.8rem;flex-shrink:0;"></span>
@@ -39,6 +53,26 @@
         <div class="log-form">
           <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;">Last Entry</div>
           <div class="form-row" style="margin-bottom:0.75rem;">
+            {% if is_cardio %}
+            <div class="form-group">
+              <label>Distance</label>
+              <span>{% if item.latest.distance %}{{ item.latest.distance|floatformat:'-2' }} {% if item.latest.distance_unit == 'mi' %}mile{% else %}km{% endif %}{% else %}—{% endif %}</span>
+            </div>
+            <div class="form-group">
+              <label>Duration</label>
+              <span>{% if item.latest.duration %}{{ item.latest.duration }} min{% else %}—{% endif %}</span>
+            </div>
+            {% if item.speed %}
+            <div class="form-group">
+              <label>Speed</label>
+              <span>{{ item.speed }} {% if item.latest.distance_unit == 'mi' %}mile/hr{% else %}km/hr{% endif %}</span>
+            </div>
+            {% endif %}
+            <div class="form-group">
+              <label>Date</label>
+              <span>{{ item.latest.date|date:'j M Y' }}</span>
+            </div>
+            {% else %}
             <div class="form-group">
               <label>Weight</label>
               <span>{% if item.latest.weight %}{{ item.latest.weight|floatformat:'-2' }}{% if item.latest.weight_unit %} {{ item.latest.weight_unit }}{% endif %}{% else %}—{% endif %}</span>
@@ -55,6 +89,7 @@
               <label>Date</label>
               <span>{{ item.latest.date|date:'j M Y' }}</span>
             </div>
+            {% endif %}
           </div>
           <button class="btn btn-secondary btn-sm" @click.stop="editing = true">✏️ Update</button>
         </div>
@@ -66,6 +101,27 @@
           <input type="hidden" name="exercise" value="{{ item.exercise.id }}">
           <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;">Log New Entry</div>
           <div class="form-row">
+            {% if is_cardio %}
+            <div class="form-group">
+              <label>Distance</label>
+              <input type="number" name="distance" step="0.1" min="0" value="{% if item.latest.distance %}{{ item.latest.distance|floatformat:'-2' }}{% else %}5{% endif %}">
+            </div>
+            <div class="form-group">
+              <label>Unit</label>
+              <select name="distance_unit">
+                <option value="km" {% if not item.latest or item.latest.distance_unit == 'km' %}selected{% endif %}>km</option>
+                <option value="mi" {% if item.latest.distance_unit == 'mi' %}selected{% endif %}>mile</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Minutes</label>
+              <input type="number" name="duration" min="1" value="{% if item.latest.duration %}{{ item.latest.duration }}{% else %}30{% endif %}">
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" name="date" value="{{ today }}">
+            </div>
+            {% else %}
             <div class="form-group">
               <label>Weight</label>
               <input type="number" name="weight" step="0.5" min="0" value="{% if item.latest.weight %}{{ item.latest.weight|floatformat:'-2' }}{% else %}5{% endif %}">
@@ -90,6 +146,7 @@
               <label>Date</label>
               <input type="date" name="date" value="{{ today }}">
             </div>
+            {% endif %}
           </div>
           <button type="submit" class="btn btn-primary btn-sm">+ Log</button>
         </form>
@@ -103,6 +160,27 @@
           <input type="hidden" name="exercise" value="{{ item.exercise.id }}">
           <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;">Update Entry</div>
           <div class="form-row">
+            {% if is_cardio %}
+            <div class="form-group">
+              <label>Distance</label>
+              <input type="number" name="distance" step="0.1" min="0" value="{% if item.latest.distance %}{{ item.latest.distance|floatformat:'-2' }}{% endif %}">
+            </div>
+            <div class="form-group">
+              <label>Unit</label>
+              <select name="distance_unit">
+                <option value="km" {% if item.latest.distance_unit == 'km' %}selected{% endif %}>km</option>
+                <option value="mi" {% if item.latest.distance_unit == 'mi' %}selected{% endif %}>mile</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Minutes</label>
+              <input type="number" name="duration" min="1" value="{{ item.latest.duration|default:'' }}">
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" name="date" value="{{ item.latest.date|date:'Y-m-d' }}">
+            </div>
+            {% else %}
             <div class="form-group">
               <label>Weight</label>
               <input type="number" name="weight" step="0.5" min="0" value="{% if item.latest.weight %}{{ item.latest.weight|floatformat:'-2' }}{% endif %}">
@@ -127,6 +205,7 @@
               <label>Date</label>
               <input type="date" name="date" value="{{ item.latest.date|date:'Y-m-d' }}">
             </div>
+            {% endif %}
           </div>
           <div class="flex-gap">
             <button type="submit" class="btn btn-primary btn-sm">Save</button>

@@ -51,8 +51,8 @@
           <th style="padding:0.5rem 0.4rem;font-weight:600;">Date</th>
           <th style="padding:0.5rem 0.4rem;font-weight:600;">Category</th>
           <th style="padding:0.5rem 0.4rem;font-weight:600;">Exercise</th>
-          <th style="padding:0.5rem 0.4rem;font-weight:600;">Weight</th>
-          <th style="padding:0.5rem 0.4rem;font-weight:600;">Sets × Reps</th>
+          <th style="padding:0.5rem 0.4rem;font-weight:600;">Weight / Dist</th>
+          <th style="padding:0.5rem 0.4rem;font-weight:600;">Reps × Sets</th>
         </tr>
       </thead>
       <tbody>
@@ -62,11 +62,18 @@
           <td style="padding:0.5rem 0.4rem;color:var(--text-secondary);">{{ log.exercise.category.name }}</td>
           <td style="padding:0.5rem 0.4rem;">{{ log.exercise.name }}</td>
           <td style="padding:0.5rem 0.4rem;">
-            {% if log.weight %}{{ log.weight }}{% if log.weight_unit %} {{ log.weight_unit }}{% endif %}{% else %}—{% endif %}
+            {% if log.exercise.category.kind == "cardio" %}
+              {% if log.distance %}{{ log.distance|floatformat:'-2' }} {% if log.distance_unit == 'mi' %}mile{% else %}km{% endif %}{% else %}—{% endif %}
+            {% else %}
+              {% if log.weight %}{{ log.weight|floatformat:'-2' }}{% if log.weight_unit %} {{ log.weight_unit }}{% endif %}{% else %}—{% endif %}
+            {% endif %}
           </td>
           <td style="padding:0.5rem 0.4rem;">
-            {% if log.sets %}{{ log.sets }}{% else %}—{% endif %} ×
-            {% if log.reps %}{{ log.reps }}{% else %}—{% endif %}
+            {% if log.exercise.category.kind == "cardio" %}
+              {% if log.duration %}{{ log.duration }} min{% else %}—{% endif %}
+            {% else %}
+              {% if log.reps %}{{ log.reps }}{% else %}—{% endif %} × {% if log.sets %}{{ log.sets }}{% else %}—{% endif %}
+            {% endif %}
           </td>
         </tr>
         {% empty %}
@@ -84,6 +91,7 @@
 {% if total_logs %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+window.addEventListener('load', function() {
   var root = getComputedStyle(document.getElementById('html-root'));
   var accent = root.getPropertyValue('--accent').trim() || '#00ffc8';
   var textColor = root.getPropertyValue('--text-primary').trim() || '#ffffff';
@@ -141,6 +149,7 @@
     }
   });
   {% endif %}
+});
 </script>
 {% endif %}
 {% endblock %}

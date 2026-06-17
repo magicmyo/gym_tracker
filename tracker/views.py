@@ -33,15 +33,23 @@ def category_detail(request, cat_id):
     exercises = cat.exercises.filter(is_active=True)
     today = today_date.today()
     pref = UserPreference.get()
+    is_cardio = cat.kind == "cardio"
 
     ex_data = []
     for ex in exercises:
         latest = ex.logs.filter(date=today).first() or ex.logs.first()
-        ex_data.append({"exercise": ex, "latest": latest})
+        speed = None
+        if is_cardio and latest and latest.distance and latest.duration:
+            try:
+                speed = round(float(latest.distance) / (latest.duration / 60.0), 1)
+            except ZeroDivisionError:
+                speed = None
+        ex_data.append({"exercise": ex, "latest": latest, "speed": speed})
 
     return render(request, "category.html", {
         "cat": cat,
         "ex_data": ex_data,
+        "is_cardio": is_cardio,
         "today": today.isoformat(),
         "theme": pref.theme,
     })
@@ -267,6 +275,9 @@ def api_sync(request):
                         weight_unit=entry.get("weight_unit", "kg"),
                         reps=entry.get("reps") or None,
                         sets=entry.get("sets") or None,
+                        distance=entry.get("distance") or None,
+                        distance_unit=entry.get("distance_unit", "km"),
+                        duration=entry.get("duration") or None,
                     )
                     created += 1
             return JsonResponse({"synced": created})

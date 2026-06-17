@@ -6,6 +6,10 @@ WEIGHT_UNIT_CHOICES = [
     ("", "bodyweight"),
 ]
 
+DISTANCE_UNIT_CHOICES = [("km", "km"), ("mi", "mile")]
+
+CATEGORY_KIND_CHOICES = [("strength", "Strength"), ("cardio", "Cardio")]
+
 THEME_CHOICES = [
     ("glass",  "Glassmorphism"),
     ("neo",    "Neomorphism"),
@@ -23,6 +27,7 @@ THEME_CHOICES = [
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    kind = models.CharField(max_length=10, choices=CATEGORY_KIND_CHOICES, default="strength")
     image = models.ImageField(upload_to="categories/", blank=True, null=True)
     color = models.CharField(max_length=20, default="#1a1a2e")
     order = models.PositiveIntegerField(default=0)
@@ -56,6 +61,9 @@ class WorkoutLog(models.Model):
     weight_unit = models.CharField(max_length=2, choices=WEIGHT_UNIT_CHOICES, default="kg", blank=True)
     reps = models.PositiveIntegerField(blank=True, null=True)
     sets = models.PositiveIntegerField(blank=True, null=True)
+    distance = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    distance_unit = models.CharField(max_length=4, choices=DISTANCE_UNIT_CHOICES, default="km", blank=True)
+    duration = models.PositiveIntegerField(blank=True, null=True)  # minutes
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
