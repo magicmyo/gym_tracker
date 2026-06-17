@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import Category, Exercise, WorkoutLog, UserPreference
 
-# Register your models here.
+admin.site.register(Category)
+admin.site.register(Exercise)
+admin.site.register(WorkoutLog)
+admin.site.register(UserPreference)
