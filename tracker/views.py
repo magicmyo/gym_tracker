@@ -135,7 +135,9 @@ def dashboard(request):
 def settings_view(request):
     pref = UserPreference.get()
     categories = Category.objects.all()
-    exercises = Exercise.objects.select_related("category").all()
+    exercises = Exercise.objects.select_related("category").order_by(
+        "category__order", "category__name", "order", "name"
+    )
     return render(request, "settings.html", {
         "pref": pref,
         "categories": categories,
