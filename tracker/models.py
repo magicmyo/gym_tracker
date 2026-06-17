@@ -69,6 +69,7 @@ class WorkoutLog(models.Model):
 
 class UserPreference(models.Model):
     theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="cyber")
+    banner = models.ImageField(upload_to="banner/", blank=True, null=True)
 
     class Meta:
         verbose_name = "User Preference"
