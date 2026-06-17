@@ -86,11 +86,11 @@
 <script>
   var root = getComputedStyle(document.getElementById('html-root'));
   var accent = root.getPropertyValue('--accent').trim() || '#00ffc8';
-  var textMuted = root.getPropertyValue('--text-muted').trim() || '#888';
+  var textColor = root.getPropertyValue('--text-secondary').trim() || '#ccc';
   var surfaceBorder = root.getPropertyValue('--surface-border').trim() || '1px solid #333';
   var borderColor = surfaceBorder.includes('#') ? surfaceBorder.split(' ').pop() : 'rgba(128,128,128,0.2)';
 
-  Chart.defaults.color = textMuted;
+  Chart.defaults.color = textColor;
   Chart.defaults.borderColor = borderColor;
 
   new Chart(document.getElementById('weeklyChart'), {
