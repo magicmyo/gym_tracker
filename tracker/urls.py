@@ -1,4 +1,17 @@
 from django.urls import path
 from . import views
 
-urlpatterns = []
+urlpatterns = [
+    path("", views.home, name="home"),
+    path("category/<int:cat_id>/", views.category_detail, name="category_detail"),
+    path("log/add/", views.log_add, name="log_add"),
+    path("log/<int:log_id>/update/", views.log_update, name="log_update"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+    path("settings/", views.settings_view, name="settings"),
+    path("settings/category/add/", views.category_add, name="category_add"),
+    path("settings/category/<int:cat_id>/delete/", views.category_delete, name="category_delete"),
+    path("settings/exercise/add/", views.exercise_add, name="exercise_add"),
+    path("settings/exercise/<int:ex_id>/delete/", views.exercise_delete, name="exercise_delete"),
+    path("settings/theme/", views.set_theme, name="set_theme"),
+    path("api/sync/", views.api_sync, name="api_sync"),
+]

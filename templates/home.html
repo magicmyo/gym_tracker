@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Gym Tracker{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<div class="grid">
+  {% for cat in categories %}
+  <a href="{% url 'category_detail' cat.id %}" class="category-card">
+    {% if cat.image %}
+      <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
+    {% else %}
+      <div class="card-placeholder" style="background: {{ cat.color }};">
+        <span style="font-size:3.5rem;">
+          {% if cat.name == "Chest" %}🏋️
+          {% elif cat.name == "Shoulders" %}💪
+          {% elif cat.name == "Arms" %}💪
+          {% elif cat.name == "Core & Back" %}🔥
+          {% elif cat.name == "Legs" %}🦵
+          {% elif cat.name == "Calisthenics" %}🤸
+          {% elif cat.name == "Cardio" %}🏃
+          {% else %}📋
+          {% endif %}
+        </span>
+      </div>
+    {% endif %}
+    <div class="card-label">
+      <span>📋</span> {{ cat.name }}
+    </div>
+  </a>
+  {% empty %}
+  <p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:3rem;">
+    No categories yet. Go to <a href="{% url 'settings' %}" style="color:var(--accent);">Settings</a> to add some.
+  </p>
+  {% endfor %}
+</div>
+{% endblock %}
