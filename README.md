@@ -1,6 +1,6 @@
 # GymTracker
 
-A simple personal gym workout tracker built for my own use. Written with [Claude Code](https://claude.ai/code) — not feature-rich, just what I personally needed to track my weights.
+A simple personal gym workout tracker built for my own use. Written with [Claude Code](https://claude.ai/code) — not feature-rich, just what I personally needed to track dumbbell and machine weights.
 
 ## What it does
 
@@ -9,7 +9,7 @@ A simple personal gym workout tracker built for my own use. Written with [Claude
 - Log distance, duration and auto-calculates speed for cardio
 - Shows your last entry when you open an exercise so you know where you left off
 - Analytics page with weekly volume chart and weight progress over time
-- Works offline — logs sync when you're back online
+- Works offline - logs sync when you're back online
 - 11 visual themes to pick from
 - Upload a banner image and set a motivation quote on the home page
 - Export and import your settings and workout logs as CSV (for backup)
