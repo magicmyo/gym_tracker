@@ -300,6 +300,7 @@ def service_worker(request):
         content = f.read()
     response = HttpResponse(content, content_type='application/javascript')
     response['Service-Worker-Allowed'] = '/'
+    response['Cache-Control'] = 'no-cache'
     return response
 
 
