@@ -1,0 +1,21 @@
+# Database — never commit personal data
+db.sqlite3
+
+# Uploaded media files
+media/
+
+# Virtual environment
+.venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Django
+*.log
+local_settings.py
+
+# OS
+.DS_Store
+Thumbs.db
